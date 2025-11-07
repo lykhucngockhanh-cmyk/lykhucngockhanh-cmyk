@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khu Du Lịch Sinh Thái Xanh Mát</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+    body {
+      background-color: #f4fff7;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #3cb371, #2e8b57);
+      color: white;
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    header h1 { font-size: 2.8em; margin-bottom: 10px; }
+
+    nav {
+      background-color: #2e8b57;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    nav a:hover { color: #ffd700; text-decoration: underline; }
+
+    section {
+      padding: 50px 80px;
+      display: none;
+      animation: fadeIn 0.8s ease;
+    }
+
+    section.active { display: block; }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e8b57;
+      margin-bottom: 25px;
+      font-size: 2em;
+    }
+
+    .hero {
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb') center/cover no-repeat;
+      height: 450px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-shadow: 2px 2px 10px #000;
+      font-size: 2.2em;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .intro {
+      text-align: center;
+      max-width: 900px;
+      margin: auto;
+      line-height: 1.8;
+      color: #444;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .gallery img {
+      width: 300px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .service {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 280px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .card:hover { transform: translateY(-5px); }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .card h3 { margin: 15px 0; color: #2e8b57; }
+    .card p { padding: 0 15px 15px; color: #555; }
+
+    .review-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      text-align: center;
+    }
+
+    .review {
+      background-color: white;
+      width: 280px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+
+    .review img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .review h4 { color: #2e8b57; margin-bottom: 5px; }
+    .review p { font-style: italic; color: #555; }
+
+    .contact p { text-align: center; color: #333; font-size: 1.1em; }
+
+    a.btn {
+      display: inline-block;
+      background-color: #2e8b57;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    a.btn:hover { background-color: #3cb371; }
+
+    form {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 500px;
+      margin: 20px auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    form input, form select, form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    form button {
+      background-color: #2e8b57;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    form button:hover { background-color: #3cb371; }
+
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    footer {
+      background-color: #2e8b57;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🏞️ Khu Du Lịch Sinh Thái Xanh Mát</h1>
+    <p>Khám phá thiên nhiên – Hòa mình vào không gian yên bình</p>
+  </header>
+
+  <nav>
+    <a onclick="showSection('home')">Trang chủ</a>
+    <a onclick="showSection('about')">Giới thiệu</a>
+    <a onclick="showSection('service')">Dịch vụ</a>
+    <a onclick="showSection('gallery')">Hình ảnh</a>
+    <a onclick="showSection('review')">Đánh giá</a>
+    <a onclick="showSection('contact')">Liên hệ</a>
+  </nav>
+
+  <!-- HOME -->
+  <section id="home" class="active">
+    <div class="hero">Chào mừng bạn đến với khu du lịch sinh thái Xanh Mát 🍃</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <h2>🌿 Giới thiệu</h2>
+    <div class="intro">
+      <p>
+        Khu du lịch sinh thái <strong>Xanh Mát</strong> là điểm đến lý tưởng cho những ai yêu thiên nhiên, thích khám phá không gian yên bình giữa rừng xanh và hồ nước trong lành.
+      </p>
+      <p style="margin-top: 10px;">
+        Đến với chúng tôi, du khách có thể nghỉ dưỡng trong không gian trong lành, tham gia các hoạt động thú vị như chèo thuyền kayak, đạp xe xuyên rừng và thưởng thức ẩm thực địa phương.
+      </p>
+    </div>
+  </section>
+
+  <!-- SERVICE -->
+  <section id="service">
+    <h2>🌺 Dịch vụ nổi bật</h2>
+    <div class="service">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1578898887932-4be56daae1c5" alt="Resort">
+        <h3>Khu nghỉ dưỡng cao cấp</h3>
+        <p>Phòng view hồ và rừng cây, không gian sang trọng và gần gũi thiên nhiên.</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="Nature Walk">
+        <h3>Tham quan sinh thái</h3>
+        <p>Hướng dẫn viên địa phương giúp bạn khám phá hệ sinh thái đa dạng và phong phú.</p>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1519817914152-22f90e0a3a43" alt="Food">
+        <h3>Ẩm thực đặc sản</h3>
+        <p>Thưởng thức các món ăn dân dã, tươi ngon đặc trưng vùng cao nguyên.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <h2>📸 Hình ảnh khu du lịch</h2>
+    <div class="gallery">
+      <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d" alt="Lake view">
+      <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994" alt="Eco house">
+      <img src="https://images.unsplash.com/photo-1498814117404-44b9a71ac276" alt="Kayaking">
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" alt="Waterfall">
+      <img src="https://images.unsplash.com/photo-1533681709291-7e29d0b1b8f8" alt="Garden">
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb" alt="Forest">
+    </div>
+  </section>
+
+  <!-- REVIEW -->
+  <section id="review">
+    <h2>🌟 Đánh giá của du khách</h2>
+    <div class="review-container">
+      <div class="review">
+        <img src="https://randomuser.me/api/portraits/women/1.jpg">
+        <h4>Lan Phương</h4>
+        <p>“Không khí thật tuyệt vời, rất trong lành và yên bình. Phong cảnh đẹp như tranh vẽ!”</p>
+      </div>
+      <div class="review">
+        <img src="https://randomuser.me/api/portraits/men/2.jpg">
+        <h4>Minh Quân</h4>
+        <p>“Dịch vụ tốt, nhân viên thân thiện. Rất đáng để quay lại cùng gia đình.”</p>
+      </div>
+      <div class="review">
+        <img src="https://randomuser.me/api/portraits/women/3.jpg">
+        <h4>Hà Vy</h4>
+        <p>“Món ăn ngon, phòng nghỉ đẹp, giá cả hợp lý. Một trải nghiệm hoàn hảo.”</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2>📞 Liên hệ & Đặt tour</h2>
+    <form>
+      <label>Họ và tên:</label>
+      <input type="text" placeholder="Nhập họ tên của bạn" required>
+      <label>Số điện thoại:</label>
+      <input type="tel" placeholder="Nhập số điện thoại" required>
+      <label>Chọn ngày tham quan:</label>
+      <input type="date" required>
+      <label>Ghi chú:</label>
+      <textarea rows="3" placeholder="Yêu cầu đặc biệt..."></textarea>
+      <button type="submit">Gửi yêu cầu đặt tour</button>
+    </form>
+
+    <div class="contact">
+      <p>📍 Địa chỉ: Khu du lịch sinh thái Xanh Mát, TP. Đà Lạt</p>
+      <p>☎️ Hotline: <strong>0988 567 999</strong></p>
+      <p>✉️ Email: <a href="mailto:lienhe@xanhmat.vn">lienhe@xanhmat.vn</a></p>
+    </div>
+
+    <iframe 
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.512830178168!2d108.44291577575246!3d11.940419636460935!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317113a4ef02dc1f%3A0x5a1a8f0457a1a8c4!2zROG7pWwgTMOhaSAtIMSQw6AgTOG6oXQ!5e0!3m2!1svi!2s!4v1708955664561!5m2!1svi!2s"
+      allowfullscreen="" loading="lazy">
+    </iframe>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Khu Du Lịch Sinh Thái Xanh Mát. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
+
