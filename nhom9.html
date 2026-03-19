@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cách Chương Trình Được Tải Lên</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    
+    @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slide-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse-box { 0%, 100% { box-shadow: 0 0 15px rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 30px rgba(59,130,246,0.6); } }
+    @keyframes float-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .fade-in { animation: fade-in 0.5s ease-out forwards; }
+    .slide-in { animation: slide-in 0.4s ease-out forwards; }
+    .pulse-active { animation: pulse-box 2s ease-in-out infinite; }
+    
+    body { font-family: 'Poppins', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .card { transition: all 0.3s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(0,0,0,0.15); }
+    
+    .memory-box { 
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+      transition: all 0.3s ease;
+    }
+    .memory-box.loaded { 
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      animation: pulse-box 1s ease-out;
+    }
+    .memory-box.relocated {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, #fed7aa 0%, #fcd34d 100%);
+    }
+    
+    .step-indicator {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #6b7280;
+      font-weight: 600;
+      margin-right: 12px;
+    }
+    .step-indicator.active { background: #3b82f6; color: white; }
+    .step-indicator.done { background: #10b981; color: white; }
+    
+    .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    
+    .btn-secondary { background: #f3f4f6; color: #374151; border: 2px solid #d1d5db; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-secondary:hover { background: #e5e7eb; border-color: #9ca3af; }
+    
+    .info-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px; border-radius: 6px; }
+    .success-box { background: #f0fdf4; border-left: 4px solid #10b981; padding: 12px; border-radius: 6px; }
+    .warn-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 6px; }
+    
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f3f4f6; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+  </style>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { mono: ['JetBrains Mono', 'monospace'], heading: ['Poppins', 'sans-serif'] } } } }
+  </script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full bg-gradient-to-br from-slate-50 to-slate-100 text-gray-800">
+  <div id="app-wrapper" class="w-full h-full flex flex-col" style="min-height: 100%;"><!-- Header -->
+   <header class="w-full px-6 py-4 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+     <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg"><i data-lucide="cpu" style="width:24px;height:24px;"></i>
+      </div>
+      <div>
+       <h1 id="page-title" class="font-heading font-bold text-2xl text-gray-900">Cách Chương Trình Được Tải Lên</h1>
+       <p id="subtitle-text" class="text-sm text-gray-600">Học cách máy tính chạy các chương trình</p>
+      </div>
+     </div>
+     <div id="status-badge" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-semibold text-sm">
+      🔄 Sẵn sàng
+     </div>
+    </div>
+   </header><!-- Main Content -->
+   <div class="flex-1 overflow-auto">
+    <div class="max-w-7xl mx-auto p-6 space-y-8"><!-- Control Panel -->
+     <section class="fade-in" style="animation-delay: 0.1s;">
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+       <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="sliders" style="width:24px;height:24px; color:#3b82f6;"></i> Hãy Thử</h2>
+       <div class="space-y-4">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-2">Nơi tải chương trình (Địa Chỉ Cơ Sở):</label> <input id="base-addr-input" type="text" value="0x1000" class="px-4 py-2 border-2 border-gray-300 rounded-lg font-mono focus:border-blue-500 focus:outline-none w-full md:w-48" placeholder="0x1000">
+         <p class="text-xs text-gray-600 mt-1">Đây là địa chỉ bộ nhớ bắt đầu (theo hệ thập lục phân)</p>
+        </div>
+        <div class="flex gap-3 flex-wrap"><button onclick="startLoad()" id="btn-load" class="btn-primary flex items-center gap-2"> <i data-lucide="play" style="width:18px;height:18px;"></i> Bước 1: Tải Chương Trình </button> <button onclick="startRelocate()" id="btn-relocate" class="btn-primary flex items-center gap-2" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"> <i data-lucide="link" style="width:18px;height:18px;"></i> Bước 2: Tái Định Vị </button> <button onclick="resetAll()" class="btn-secondary flex items-center gap-2"> <i data-lucide="rotate-ccw" style="width:18px;height:18px;"></i> Đặt Lại </button>
+        </div>
+       </div>
+      </div>
+     </section><!-- Memory Visualization -->
+     <section class="fade-in" style="animation-delay: 0.2s;">
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+       <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="hard-drive" style="width:24px;height:24px; color:#3b82f6;"></i> Bố Cục Bộ Nhớ</h2>
+       <p class="text-gray-600 text-sm mb-4">Đây là cách chương trình được bố trí trong bộ nhớ. Mỗi ô vuông đại diện cho một vị trí bộ nhớ:</p>
+       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="flex items-center gap-2">
+         <div class="w-6 h-6 rounded bg-gray-200 border-2 border-gray-400"></div><span class="text-sm text-gray-700">Trống</span>
+        </div>
+        <div class="flex items-center gap-2">
+         <div class="w-6 h-6 rounded bg-blue-200 border-2 border-blue-400"></div><span class="text-sm text-gray-700">.text (mã)</span>
+        </div>
+        <div class="flex items-center gap-2">
+         <div class="w-6 h-6 rounded bg-purple-200 border-2 border-purple-400"></div><span class="text-sm text-gray-700">.data (biến)</span>
+        </div>
+        <div class="flex items-center gap-2">
+         <div class="w-6 h-6 rounded bg-amber-200 border-2 border-amber-500"></div><span class="text-sm text-gray-700">Đã Định Vị</span>
+        </div>
+       </div>
+       <div id="memory-grid" class="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-2"><!-- Memory cells populated by JS -->
+       </div>
+      </div>
+     </section><!-- Detailed Information -->
+     <section class="fade-in" style="animation-delay: 0.3s;">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><!-- Modules Info -->
+       <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="package" style="width:20px;height:20px; color:#3b82f6;"></i> Mô-đun</h3>
+        <div id="modules-info" class="space-y-3">
+         <div class="border-l-4 border-blue-400 pl-3 py-2">
+          <div class="font-semibold text-gray-900">
+           Mô-đun A (main.o)
+          </div>
+          <p class="text-sm text-gray-600">Chứa mã chương trình chính và dữ liệu của bạn</p>
+         </div>
+         <div class="border-l-4 border-purple-400 pl-3 py-2">
+          <div class="font-semibold text-gray-900">
+           Mô-đun B (lib.o)
+          </div>
+          <p class="text-sm text-gray-600">Chứa các hàm thư viện mà chương trình của bạn sử dụng</p>
+         </div>
+        </div>
+       </div><!-- Process Info -->
+       <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="workflow" style="width:20px;height:20px; color:#3b82f6;"></i> Các Bước Quy Trình</h3>
+        <div class="space-y-3">
+         <div class="flex items-start"><span id="step1-indicator" class="step-indicator">1</span>
+          <div>
+           <div class="font-semibold text-gray-900">
+            Tải Chương Trình
+           </div>
+           <p class="text-sm text-gray-600">Đọc tất cả các phần chương trình từ đĩa vào bộ nhớ</p>
+          </div>
+         </div>
+         <div class="flex items-start"><span id="step2-indicator" class="step-indicator">2</span>
+          <div>
+           <div class="font-semibold text-gray-900">
+            Giải Quyết Ký Hiệu
+           </div>
+           <p class="text-sm text-gray-600">Tìm nơi mỗi hàm và biến kết thúc trong bộ nhớ</p>
+          </div>
+         </div>
+         <div class="flex items-start"><span id="step3-indicator" class="step-indicator">3</span>
+          <div>
+           <div class="font-semibold text-gray-900">
+            Vá Địa Chỉ
+           </div>
+           <p class="text-sm text-gray-600">Cập nhật tất cả tham chiếu địa chỉ để trỏ đến các vị trí chính xác</p>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </section><!-- Log Panel -->
+     <section class="fade-in" style="animation-delay: 0.4s;">
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+       <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="activity" style="width:20px;height:20px; color:#3b82f6;"></i> Điều Gì Đang Xảy Ra</h3>
+       <div id="log-panel" class="bg-gray-50 rounded-lg p-4 font-mono text-sm space-y-2 max-h-64 overflow-y-auto border border-gray-200">
+        <div class="text-gray-500">
+         👋 Chờ bạn nhấp "Tải Chương Trình"...
+        </div>
+       </div>
+      </div>
+     </section><!-- Symbol Table -->
+     <section class="fade-in" style="animation-delay: 0.5s;">
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+       <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="list" style="width:20px;height:20px; color:#3b82f6;"></i> Bảng Ký Hiệu (Hàm &amp; Biến)</h3>
+       <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+         <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Tên</th>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Vị Trí</th>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Loại</th>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Địa Chỉ</th>
+          </tr>
+         </thead>
+         <tbody id="symbol-table" class="divide-y divide-gray-200">
+          <tr>
+           <td colspan="4" class="px-4 py-3 text-center text-gray-500">Tải chương trình để xem ký hiệu</td>
+          </tr>
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </section><!-- Relocation Table -->
+     <section class="fade-in" style="animation-delay: 0.6s;">
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+       <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><i data-lucide="shuffle" style="width:20px;height:20px; color:#3b82f6;"></i> Bảng Tái Định Vị (Sửa Địa Chỉ)</h3>
+       <p class="text-gray-600 text-sm mb-4">Đây là những vị trí trong chương trình cần cập nhật địa chỉ:</p>
+       <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+         <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Vị Trí</th>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Ký Hiệu Cần Sửa</th>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Địa Chỉ Đã Sửa</th>
+           <th class="px-4 py-2 text-left font-semibold text-gray-900">Trạng Thái</th>
+          </tr>
+         </thead>
+         <tbody id="reloc-table" class="divide-y divide-gray-200">
+          <tr>
+           <td colspan="4" class="px-4 py-3 text-center text-gray-500">Thông tin tái định vị sẽ xuất hiện ở đây</td>
+          </tr>
+         </tbody>
+        </table>
+       </div>
+      </div>
+     </section>
+    </div>
+   </div>
+  </div>
+  <script>
+    // ── Config & SDK ──
+    const defaultConfig = {
+      page_title: "Cách Chương Trình Được Tải Lên",
+      subtitle_text: "Học cách máy tính chạy các chương trình",
+    };
+
+    function applyConfig(config) {
+      const c = { ...defaultConfig, ...config };
+      const titleEl = document.getElementById('page-title');
+      const subEl = document.getElementById('subtitle-text');
+      if (titleEl) titleEl.textContent = c.page_title;
+      if (subEl) subEl.textContent = c.subtitle_text;
+    }
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => { applyConfig(config); },
+      mapToCapabilities: (config) => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ["page_title", config.page_title || defaultConfig.page_title],
+        ["subtitle_text", config.subtitle_text || defaultConfig.subtitle_text],
+      ])
+    });
+
+    // ── Data ──
+    const MODULES = [
+      {
+        name: "Mô-đun A",
+        type: ".text (Mã)",
+        size: 6,
+        color: "bg-blue-200",
+        borderColor: "border-blue-400",
+      },
+      {
+        name: "Mô-đun A",
+        type: ".data (Dữ Liệu)",
+        size: 3,
+        color: "bg-purple-200",
+        borderColor: "border-purple-400",
+      },
+      {
+        name: "Mô-đun B",
+        type: ".text (Mã)",
+        size: 4,
+        color: "bg-blue-200",
+        borderColor: "border-blue-400",
+      },
+      {
+        name: "Mô-đun B",
+        type: ".data (Dữ Liệu)",
+        size: 2,
+        color: "bg-purple-200",
+        borderColor: "border-purple-400",
+      },
+    ];
+
+    const SYMBOLS = [
+      { name: "msg", location: "Mô-đun A .data", type: "Biến", loaded: false, address: "" },
+      { name: "print_func", location: "Mô-đun B .text", type: "Hàm", loaded: false, address: "" },
+      { name: "global_var", location: "Mô-đun A .data", type: "Biến", loaded: false, address: "" },
+      { name: "exit_func", location: "Bên ngoài", type: "Hàm", loaded: false, address: "" },
+    ];
+
+    const RELOCATIONS = [
+      { offset: "0x00", symbol: "msg", fixed: false, newAddr: "" },
+      { offset: "0x05", symbol: "print_func", fixed: false, newAddr: "" },
+      { offset: "0x14", symbol: "exit_func", fixed: false, newAddr: "" },
+    ];
+
+    let memory = [];
+    let baseAddress = 0x1000;
+    let isLoaded = false;
+    let isRelocated = false;
+    let logEntries = [];
+    const MEMORY_SIZE = 40;
+
+    // ── Init ──
+    function initMemory() {
+      memory = [];
+      for (let i = 0; i < MEMORY_SIZE; i++) {
+        memory.push({ addr: baseAddress + i, content: "", section: "", module: "", relocated: false });
+      }
+    }
+
+    function renderMemoryGrid() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+
+      memory.forEach((cell, idx) => {
+        const div = document.createElement('div');
+        let classes = 'memory-box ';
+        if (cell.section === '.text') classes += 'border-blue-400 bg-blue-100';
+        else if (cell.section === '.data') classes += 'border-purple-400 bg-purple-100';
+        else classes += 'border-gray-400 bg-gray-100';
+        
+        if (cell.relocated) classes += ' relocated';
+        else if (cell.section) classes += ' loaded';
+
+        div.className = classes;
+        div.style.fontSize = '11px';
+        div.innerHTML = `<div class="font-mono font-semibold text-gray-700">${cell.content || '-'}</div>`;
+        grid.appendChild(div);
+      });
+    }
+
+    function addLog(msg) {
+      logEntries.push(msg);
+      const panel = document.getElementById('log-panel');
+      panel.innerHTML = '';
+      logEntries.slice(-15).forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'text-gray-700 font-mono text-sm';
+        div.textContent = '→ ' + entry;
+        div.style.animation = 'float-up 0.4s ease-out';
+        panel.appendChild(div);
+      });
+      panel.scrollTop = panel.scrollHeight;
+    }
+
+    function updateStatus(text, icon = '🔄') {
+      document.getElementById('status-badge').textContent = icon + ' ' + text;
+    }
+
+    // ── Actions ──
+    async function startLoad() {
+      if (isLoaded) {
+        addLog('❌ Đã tải rồi - nhấp Đặt Lại trước');
+        return;
+      }
+
+      const addrInput = document.getElementById('base-addr-input').value.trim();
+      const parsed = parseInt(addrInput, 16);
+      if (isNaN(parsed)) {
+        addLog('❌ Địa chỉ không hợp lệ - sử dụng định dạng như 0x1000');
+        return;
+      }
+
+      baseAddress = parsed;
+      initMemory();
+      isLoaded = true;
+      isRelocated = false;
+
+      updateStatus('Đang tải...', '⏳');
+      addLog(`🎯 Bắt đầu tải tại ${addrInput}`);
+
+      let memIdx = 0;
+      
+      for (let mi = 0; mi < MODULES.length; mi++) {
+        const mod = MODULES[mi];
+        addLog(`📦 Đang tải ${mod.name} ${mod.type} (${mod.size} byte)`);
+
+        for (let i = 0; i < mod.size; i++) {
+          if (memIdx >= MEMORY_SIZE) break;
+          memory[memIdx].content = `${memIdx}`;
+          memory[memIdx].section = mod.type;
+          memory[memIdx].module = mod.name;
+          memIdx++;
+          await sleep(100);
+          renderMemoryGrid();
+        }
+      }
+
+      // Update symbol table
+      const symbolTable = document.getElementById('symbol-table');
+      symbolTable.innerHTML = '';
+      SYMBOLS.forEach(sym => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="px-4 py-2 font-mono font-semibold text-gray-900">${sym.name}</td>
+          <td class="px-4 py-2 text-gray-700">${sym.location}</td>
+          <td class="px-4 py-2"><span class="px-2 py-1 rounded text-xs font-semibold ${sym.type === 'Hàm' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${sym.type}</span></td>
+          <td class="px-4 py-2 font-mono text-gray-600">—</td>
+        `;
+        symbolTable.appendChild(tr);
+      });
+
+      // Update step indicator
+      document.getElementById('step1-indicator').className = 'step-indicator done';
+
+      updateStatus('Chương Trình Được Tải! 📚', '✅');
+      addLog('✅ Tất cả mô-đun được tải thành công');
+    }
+
+    async function startRelocate() {
+      if (!isLoaded) {
+        addLog('❌ Tải chương trình trước');
+        return;
+      }
+      if (isRelocated) {
+        addLog('❌ Đã định vị rồi - nhấp Đặt Lại trước');
+        return;
+      }
+
+      updateStatus('Đang Tái Định Vị...', '🔗');
+      addLog('🔗 Bắt đầu giai đoạn tái định vị');
+
+      const symbolAddrs = {
+        'msg': baseAddress + 9,
+        'print_func': baseAddress + 12,
+        'exit_func': 0xDEAD,
+      };
+
+      for (const reloc of RELOCATIONS) {
+        const addr = symbolAddrs[reloc.symbol];
+        const addrStr = `0x${addr.toString(16).toUpperCase().padStart(4, '0')}`;
+        
+        addLog(`🔨 Sửa ${reloc.symbol} → ${addrStr}`);
+
+        // Mark relocatable cells
+        for (let i = 0; i < memory.length; i++) {
+          if (i === parseInt(reloc.offset.slice(2), 16)) {
+            memory[i].relocated = true;
+          }
+        }
+
+        reloc.fixed = true;
+        reloc.newAddr = addrStr;
+        
+        await sleep(300);
+        renderMemoryGrid();
+      }
+
+      // Update relocation table
+      const relocTable = document.getElementById('reloc-table');
+      relocTable.innerHTML = '';
+      RELOCATIONS.forEach(reloc => {
+        const tr = document.createElement('tr');
+        tr.className = reloc.fixed ? 'bg-green-50' : '';
+        tr.innerHTML = `
+          <td class="px-4 py-2 font-mono font-semibold text-gray-900">${reloc.offset}</td>
+          <td class="px-4 py-2 font-mono text-gray-700">${reloc.symbol}</td>
+          <td class="px-4 py-2 font-mono font-bold text-gray-900">${reloc.newAddr || '—'}</td>
+          <td class="px-4 py-2"><span class="px-2 py-1 rounded text-xs font-semibold ${reloc.fixed ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-800'}">${reloc.fixed ? '✅ Đã Sửa' : 'Đang Chờ'}</span></td>
+        `;
+        relocTable.appendChild(tr);
+      });
+
+      document.getElementById('step2-indicator').className = 'step-indicator done';
+      document.getElementById('step3-indicator').className = 'step-indicator done';
+
+      isRelocated = true;
+      updateStatus('Sẵn Sàng Chạy! 🚀', '✅');
+      addLog('✅ Tái định vị hoàn thành - chương trình sẵn sàng!');
+    }
+
+    function resetAll() {
+      isLoaded = false;
+      isRelocated = false;
+      logEntries = [];
+      
+      SYMBOLS.forEach(s => { s.loaded = false; s.address = ''; });
+      RELOCATIONS.forEach(r => { r.fixed = false; r.newAddr = ''; });
+
+      initMemory();
+      renderMemoryGrid();
+      
+      document.getElementById('symbol-table').innerHTML = '<tr><td colspan="4" class="px-4 py-3 text-center text-gray-500">Tải chương trình để xem ký hiệu</td></tr>';
+      document.getElementById('reloc-table').innerHTML = '<tr><td colspan="4" class="px-4 py-3 text-center text-gray-500">Thông tin tái định vị sẽ xuất hiện ở đây</td></tr>';
+      document.getElementById('log-panel').innerHTML = '<div class="text-gray-500">👋 Chờ bạn nhấp "Tải Chương Trình"...</div>';
+      
+      document.getElementById('step1-indicator').className = 'step-indicator';
+      document.getElementById('step2-indicator').className = 'step-indicator';
+      document.getElementById('step3-indicator').className = 'step-indicator';
+
+      updateStatus('Sẵn Sàng', '🔄');
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // ── Init ──
+    initMemory();
+    renderMemoryGrid();
+    lucide.createIcons();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9dee0e1c0664853e',t:'MTc3MzkzOTg1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
