@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dining Philosophers</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        .table {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 50px auto;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .philosopher {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            position: absolute;
+            line-height: 60px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .thinking { background: green; }
+        .hungry { background: orange; }
+        .eating { background: red; }
+    </style>
+</head>
+
+<body>
+    <h2>Mô phỏng bài toán Dining Philosophers</h2>
+
+    <div class="table">
+        <div class="philosopher thinking" id="p0" style="top:0; left:120px">P0</div>
+        <div class="philosopher thinking" id="p1" style="top:80px; right:0">P1</div>
+        <div class="philosopher thinking" id="p2" style="bottom:0; right:80px">P2</div>
+        <div class="philosopher thinking" id="p3" style="bottom:0; left:80px">P3</div>
+        <div class="philosopher thinking" id="p4" style="top:80px; left:0">P4</div>
+    </div>
+
+    <script>
+        const N = 5;
+        let state = Array(N).fill("thinking");
+
+        function randomTime() {
+            return Math.floor(Math.random() * 2000) + 1000;
+        }
+
+        function setState(i, s) {
+            state[i] = s;
+            const p = document.getElementById("p" + i);
+            p.className = "philosopher " + s;
+        }
+
+        function philosopher(i) {
+            setState(i, "thinking");
+
+            setTimeout(() => {
+                setState(i, "hungry");
+
+                setTimeout(() => {
+                    setState(i, "eating");
+
+                    setTimeout(() => {
+                        philosopher(i);
+                    }, randomTime());
+
+                }, i % 2 === 0 ? 500 : 1000);
+
+            }, randomTime());
+        }
+
+        for (let i = 0; i < N; i++) {
+            philosopher(i);
+        }
+    </script>
+</body>
+</html>
