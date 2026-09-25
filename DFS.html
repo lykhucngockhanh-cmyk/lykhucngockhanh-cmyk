@@ -1,0 +1,1933 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DFS Visualizer</title>
+
+<style>
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:"Segoe UI",Arial,sans-serif;
+    color:#172033;
+    background:
+        radial-gradient(circle at 10% 10%,rgba(99,102,241,.18),transparent 25%),
+        radial-gradient(circle at 90% 20%,rgba(14,165,233,.16),transparent 25%),
+        linear-gradient(135deg,#eef2ff,#f8fafc 50%,#e0f2fe);
+    min-height:100vh;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+header{
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+    padding:65px 20px 75px;
+    color:white;
+    background:
+        linear-gradient(135deg,#312e81,#4f46e5,#0284c7);
+}
+
+header::before,
+header::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+}
+
+header::before{
+    width:280px;
+    height:280px;
+    top:-120px;
+    left:-70px;
+}
+
+header::after{
+    width:350px;
+    height:350px;
+    right:-100px;
+    bottom:-180px;
+}
+
+.header-content{
+    position:relative;
+    z-index:2;
+}
+
+.logo{
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    width:75px;
+    height:75px;
+    margin-bottom:20px;
+    border-radius:22px;
+    font-size:38px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
+    box-shadow:0 10px 35px rgba(0,0,0,.2);
+}
+
+header h1{
+    font-size:48px;
+    font-weight:800;
+    letter-spacing:-1px;
+    margin-bottom:12px;
+}
+
+header p{
+    font-size:18px;
+    opacity:.92;
+}
+
+.badge{
+    display:inline-block;
+    margin-top:20px;
+    padding:8px 17px;
+    border:1px solid rgba(255,255,255,.3);
+    border-radius:30px;
+    background:rgba(255,255,255,.12);
+    backdrop-filter:blur(8px);
+    font-size:14px;
+}
+
+
+/* =====================================================
+   CONTAINER
+===================================================== */
+
+.container{
+    width:92%;
+    max-width:1250px;
+    margin:-30px auto 50px;
+    position:relative;
+    z-index:5;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.card{
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:22px;
+    padding:28px;
+    margin-bottom:25px;
+    box-shadow:
+        0 15px 45px rgba(15,23,42,.08),
+        0 3px 10px rgba(15,23,42,.04);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 20px 50px rgba(15,23,42,.11);
+}
+
+.card h2{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:#312e81;
+    font-size:23px;
+    margin-bottom:20px;
+}
+
+
+/* =====================================================
+   INTRO
+===================================================== */
+
+.intro{
+    font-size:16px;
+    line-height:1.8;
+    color:#475569;
+}
+
+.intro b{
+    color:#4338ca;
+}
+
+.example{
+    position:relative;
+    margin-top:20px;
+    padding:20px 22px;
+    border-radius:16px;
+    border:1px solid #c7d2fe;
+    background:linear-gradient(135deg,#eef2ff,#f0f9ff);
+    line-height:1.8;
+}
+
+.example::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:15px;
+    bottom:15px;
+    width:5px;
+    border-radius:0 5px 5px 0;
+    background:linear-gradient(#6366f1,#06b6d4);
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.form-group{
+    margin-bottom:22px;
+}
+
+label{
+    display:block;
+    margin-bottom:9px;
+    font-weight:700;
+    color:#334155;
+}
+
+input{
+    width:100%;
+    padding:15px 17px;
+    border:2px solid #e2e8f0;
+    border-radius:13px;
+    background:#f8fafc;
+    color:#1e293b;
+    font-size:16px;
+    transition:.25s;
+}
+
+input:hover{
+    border-color:#c7d2fe;
+}
+
+input:focus{
+    outline:none;
+    border-color:#6366f1;
+    background:white;
+    box-shadow:0 0 0 4px rgba(99,102,241,.12);
+}
+
+.hint{
+    display:block;
+    margin-top:8px;
+    color:#64748b;
+    line-height:1.6;
+    font-size:13px;
+}
+
+.hint b{
+    color:#4f46e5;
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.buttons{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+button{
+    position:relative;
+    overflow:hidden;
+    border:none;
+    padding:14px 22px;
+    border-radius:13px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.25s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+}
+
+button:active{
+    transform:translateY(0);
+}
+
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.run{
+    color:white;
+    background:linear-gradient(135deg,#4f46e5,#2563eb);
+    box-shadow:0 8px 20px rgba(79,70,229,.25);
+}
+
+.step{
+    color:white;
+    background:linear-gradient(135deg,#059669,#16a34a);
+    box-shadow:0 8px 20px rgba(22,163,74,.2);
+}
+
+.reset{
+    color:white;
+    background:linear-gradient(135deg,#64748b,#475569);
+}
+
+
+/* =====================================================
+   GRAPH AREA
+===================================================== */
+
+.graph-container{
+    position:relative;
+    width:100%;
+    height:540px;
+    overflow:hidden;
+    border-radius:20px;
+    border:2px solid #cbd5e1;
+
+    background-color:#f8fafc;
+
+    background-image:
+        linear-gradient(#e2e8f0 1px,transparent 1px),
+        linear-gradient(90deg,#e2e8f0 1px,transparent 1px);
+
+    background-size:30px 30px;
+
+    box-shadow:
+        inset 0 0 50px rgba(79,70,229,.04);
+}
+
+.graph-container::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(
+        circle at center,
+        transparent 20%,
+        rgba(99,102,241,.05)
+    );
+}
+
+.graph-message{
+    position:absolute;
+    width:100%;
+    text-align:center;
+    top:45%;
+    color:#64748b;
+    z-index:3;
+    font-size:16px;
+}
+
+
+/* =====================================================
+   NODE
+===================================================== */
+
+.node{
+    position:absolute;
+    width:62px;
+    height:62px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    border-radius:50%;
+
+    background:linear-gradient(135deg,#4f46e5,#2563eb);
+    color:white;
+
+    font-size:19px;
+    font-weight:800;
+
+    border:4px solid white;
+
+    box-shadow:
+        0 8px 20px rgba(37,99,235,.28);
+
+    transition:
+        transform .4s,
+        background .4s,
+        box-shadow .4s;
+
+    z-index:4;
+}
+
+.node:hover{
+    transform:scale(1.12);
+}
+
+.node.visited{
+    background:linear-gradient(135deg,#059669,#16a34a);
+    box-shadow:
+        0 8px 25px rgba(22,163,74,.3);
+}
+
+.node.current{
+    background:linear-gradient(135deg,#f59e0b,#f97316);
+    transform:scale(1.28);
+
+    box-shadow:
+        0 0 0 7px rgba(245,158,11,.16),
+        0 0 30px rgba(245,158,11,.5);
+}
+
+
+/* =====================================================
+   EDGE
+===================================================== */
+
+.edge{
+    position:absolute;
+    height:4px;
+    background:#94a3b8;
+    transform-origin:left center;
+    z-index:2;
+    border-radius:10px;
+    transition:.4s;
+}
+
+.edge.active{
+    height:6px;
+    background:linear-gradient(90deg,#22c55e,#10b981);
+    box-shadow:0 0 10px rgba(16,185,129,.35);
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+.result{
+    padding:23px;
+    border-radius:18px;
+    border:1px solid #c7d2fe;
+    background:linear-gradient(
+        135deg,
+        #eef2ff,
+        #f0f9ff
+    );
+}
+
+.result-title{
+    margin-bottom:16px;
+    font-weight:700;
+    color:#475569;
+}
+
+.order{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    min-height:48px;
+}
+
+.order-node{
+    width:47px;
+    height:47px;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:white;
+    font-weight:800;
+
+    background:linear-gradient(
+        135deg,
+        #4f46e5,
+        #2563eb
+    );
+
+    box-shadow:0 5px 14px rgba(37,99,235,.25);
+
+    animation:pop .35s ease;
+}
+
+.arrow{
+    font-size:22px;
+    font-weight:bold;
+    color:#64748b;
+}
+
+@keyframes pop{
+    0%{
+        transform:scale(.5);
+        opacity:0;
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.explanation{
+    margin-top:18px;
+    padding:20px;
+    border-radius:16px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    line-height:1.8;
+}
+
+#status{
+    display:inline-block;
+    margin-left:5px;
+    color:#4f46e5;
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-area{
+    margin-top:20px;
+}
+
+.progress-info{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:600;
+}
+
+.progress{
+    width:100%;
+    height:9px;
+    overflow:hidden;
+    border-radius:20px;
+    background:#e2e8f0;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    border-radius:20px;
+    background:linear-gradient(
+        90deg,
+        #4f46e5,
+        #06b6d4
+    );
+    transition:.4s;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table-wrapper{
+    overflow-x:auto;
+    border-radius:14px;
+    border:1px solid #e2e8f0;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:650px;
+}
+
+th,td{
+    padding:14px;
+    text-align:center;
+    border-bottom:1px solid #e2e8f0;
+}
+
+th{
+    color:white;
+    background:linear-gradient(
+        135deg,
+        #4f46e5,
+        #2563eb
+    );
+}
+
+td{
+    background:white;
+}
+
+tr:hover td{
+    background:#f8fafc;
+}
+
+tr:last-child td{
+    border-bottom:none;
+}
+
+
+/* =====================================================
+   GUIDE
+===================================================== */
+
+.guide{
+    counter-reset:guide;
+}
+
+.guide li{
+    list-style:none;
+    position:relative;
+    padding:12px 15px 12px 52px;
+    margin-bottom:10px;
+    border-radius:12px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    line-height:1.7;
+}
+
+.guide li::before{
+    counter-increment:guide;
+    content:counter(guide);
+    position:absolute;
+    left:14px;
+    top:11px;
+
+    width:28px;
+    height:28px;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+
+    background:linear-gradient(
+        135deg,
+        #6366f1,
+        #2563eb
+    );
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer{
+    margin-top:50px;
+    padding:35px 20px;
+    text-align:center;
+    color:#cbd5e1;
+    background:#0f172a;
+}
+
+footer strong{
+    color:white;
+}
+
+.footer-small{
+    margin-top:8px;
+    color:#94a3b8;
+    font-size:13px;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:700px){
+
+    header{
+        padding:50px 18px 65px;
+    }
+
+    header h1{
+        font-size:34px;
+    }
+
+    header p{
+        font-size:15px;
+    }
+
+    .container{
+        width:94%;
+    }
+
+    .card{
+        padding:20px;
+        border-radius:18px;
+    }
+
+    .graph-container{
+        height:450px;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+
+    button{
+        width:100%;
+    }
+
+    .node{
+        width:55px;
+        height:55px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+    <div class="header-content">
+
+        <div class="logo">
+            🔎
+        </div>
+
+        <h1>DFS Visualizer</h1>
+
+        <p>
+            Mô phỏng thuật toán tìm kiếm theo chiều sâu
+        </p>
+
+        <div class="badge">
+            Depth-First Search • Graph Algorithm
+        </div>
+
+    </div>
+
+</header>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+     GIỚI THIỆU
+===================================================== -->
+
+<div class="card">
+
+    <h2>🔎 DFS là gì?</h2>
+
+    <div class="intro">
+
+        <p>
+
+            <b>DFS (Depth-First Search)</b>
+            là thuật toán tìm kiếm theo chiều sâu,
+            được sử dụng để duyệt các đỉnh của một đồ thị.
+
+        </p>
+
+        <div class="example">
+
+            <b>💡 Hiểu đơn giản:</b>
+
+            <br>
+
+            DFS giống như khi bạn khám phá một mê cung.
+            Bạn chọn một đường đi và đi sâu nhất có thể.
+            Khi không thể đi tiếp, bạn quay lại và
+            thử một hướng khác.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     NHẬP ĐỒ THỊ
+===================================================== -->
+
+<div class="card">
+
+    <h2>⚙️ Nhập đồ thị</h2>
+
+
+    <div class="form-group">
+
+        <label>1. Các đỉnh</label>
+
+        <input
+            type="text"
+            id="vertices"
+            placeholder="Ví dụ: A B C D E"
+            value="A B C D E"
+        >
+
+        <small class="hint">
+
+            💡 Nhập tên các đỉnh, cách nhau bằng dấu cách.
+
+            <br>
+
+            Ví dụ:
+            <b>A B C D E</b>
+
+        </small>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>2. Các cạnh</label>
+
+        <input
+            type="text"
+            id="edges"
+            placeholder="Ví dụ: AB BC CD hoặc A-B B-C C-D"
+            value="AB BC CD DE"
+        >
+
+        <small class="hint">
+
+            💡 Có thể nhập nhiều dạng:
+
+            <br>
+
+            <b>AB BC CD</b>
+
+            hoặc
+
+            <b>A-B B-C C-D</b>
+
+            hoặc
+
+            <b>A-B, B-C, C-D</b>
+
+            hoặc
+
+            <b>AB,BC,CD</b>
+
+        </small>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>3. Đỉnh bắt đầu</label>
+
+        <input
+            type="text"
+            id="start"
+            placeholder="Ví dụ: A"
+            value="A"
+        >
+
+        <small class="hint">
+
+            💡 Nhập đỉnh bắt đầu thực hiện DFS.
+
+        </small>
+
+    </div>
+
+
+    <div class="buttons">
+
+        <button
+            class="run"
+            onclick="createGraph()"
+        >
+            ▶ Tạo đồ thị & chạy DFS
+        </button>
+
+
+        <button
+            class="step"
+            id="stepBtn"
+            onclick="nextStep()"
+            disabled
+        >
+            ➜ Từng bước
+        </button>
+
+
+        <button
+            class="reset"
+            onclick="resetAll()"
+        >
+            ↻ Làm lại
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ĐỒ THỊ
+===================================================== -->
+
+<div class="card">
+
+    <h2>📊 Đồ thị trực quan</h2>
+
+    <div
+        class="graph-container"
+        id="graph"
+    >
+
+        <div class="graph-message">
+
+            🧩
+
+            <br><br>
+
+            Nhập dữ liệu rồi nhấn
+            <b>"Tạo đồ thị & chạy DFS"</b>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     KẾT QUẢ
+===================================================== -->
+
+<div class="card">
+
+    <h2>📌 Kết quả DFS</h2>
+
+
+    <div class="result">
+
+        <div class="result-title">
+
+            Thứ tự các đỉnh được duyệt:
+
+        </div>
+
+
+        <div
+            class="order"
+            id="order"
+        >
+
+            Chưa thực hiện DFS
+
+        </div>
+
+    </div>
+
+
+    <div class="progress-area">
+
+        <div class="progress-info">
+
+            <span>Tiến trình DFS</span>
+
+            <span id="progressText">0%</span>
+
+        </div>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="progressBar"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="explanation">
+
+        <b>Trạng thái:</b>
+
+        <span id="status">
+            Chưa bắt đầu
+        </span>
+
+
+        <br><br>
+
+
+        <b>Giải thích:</b>
+
+        <div id="explanation">
+
+            Nhập đồ thị rồi nhấn
+            "Tạo đồ thị & chạy DFS".
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     BẢNG
+===================================================== -->
+
+<div class="card">
+
+    <h2>📝 Các bước thực hiện</h2>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Bước</th>
+
+                    <th>Đỉnh đang xét</th>
+
+                    <th>Thứ tự đã duyệt</th>
+
+                    <th>Giải thích</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="stepTable">
+
+                <tr>
+
+                    <td colspan="4">
+                        Chưa có dữ liệu
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     HƯỚNG DẪN
+===================================================== -->
+
+<div class="card">
+
+    <h2>📖 Hướng dẫn sử dụng</h2>
+
+    <ol class="guide">
+
+        <li>
+            Nhập các đỉnh.
+            Ví dụ: <b>A B C D E</b>
+        </li>
+
+        <li>
+            Nhập các cạnh.
+            Ví dụ: <b>AB BC CD DE</b>
+        </li>
+
+        <li>
+            Chọn đỉnh bắt đầu.
+            Ví dụ: <b>A</b>
+        </li>
+
+        <li>
+            Nhấn
+            <b>"Tạo đồ thị & chạy DFS"</b>
+        </li>
+
+        <li>
+            Nhấn
+            <b>"Từng bước"</b>
+            để xem quá trình DFS.
+        </li>
+
+        <li>
+            Theo dõi màu sắc:
+            <b>🟢 đã duyệt</b> —
+            <b>🟠 đang xét</b> —
+            <b>🔵 chưa duyệt</b>
+        </li>
+
+    </ol>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <p>
+        🔎 <strong>DFS Visualizer</strong>
+    </p>
+
+    <div class="footer-small">
+        Công cụ học tập thuật toán đồ thị
+    </div>
+
+</footer>
+
+
+<script>
+
+/* =====================================================
+   BIẾN
+===================================================== */
+
+let graphData = {};
+let vertices = [];
+let edges = [];
+let dfsOrder = [];
+let currentStep = 0;
+
+
+/* =====================================================
+   TẠO ĐỒ THỊ
+===================================================== */
+
+function createGraph(){
+
+    const vertexInput =
+        document.getElementById("vertices").value.trim();
+
+    const edgeInput =
+        document.getElementById("edges").value.trim();
+
+    const start =
+        document.getElementById("start")
+        .value.trim()
+        .toUpperCase();
+
+
+    if(!vertexInput){
+
+        alert("Vui lòng nhập các đỉnh!");
+
+        return;
+
+    }
+
+
+    vertices =
+        vertexInput
+        .toUpperCase()
+        .split(/\s+/)
+        .filter(v => v !== "");
+
+
+    vertices =
+        [...new Set(vertices)];
+
+
+    graphData = {};
+
+
+    vertices.forEach(v => {
+
+        graphData[v] = [];
+
+    });
+
+
+    parseEdges(edgeInput);
+
+
+    if(!graphData[start]){
+
+        alert(
+            "Đỉnh bắt đầu không tồn tại trong danh sách đỉnh!"
+        );
+
+        return;
+
+    }
+
+
+    Object.keys(graphData).forEach(v => {
+
+        graphData[v].sort();
+
+    });
+
+
+    dfsOrder = [];
+
+    const visited = new Set();
+
+
+    function dfs(vertex){
+
+        visited.add(vertex);
+
+        dfsOrder.push(vertex);
+
+
+        graphData[vertex].forEach(next => {
+
+            if(!visited.has(next)){
+
+                dfs(next);
+
+            }
+
+        });
+
+    }
+
+
+    dfs(start);
+
+
+    currentStep = 0;
+
+
+    drawGraph();
+
+    showInitialResult();
+
+
+    document.getElementById("stepBtn").disabled =
+        dfsOrder.length === 0;
+
+}
+
+
+/* =====================================================
+   PHÂN TÍCH CẠNH
+===================================================== */
+
+function parseEdges(input){
+
+    edges = [];
+
+    if(!input){
+
+        return;
+
+    }
+
+
+    input =
+        input
+        .toUpperCase()
+        .trim();
+
+
+    input =
+        input.replace(/,/g," ");
+
+
+    input =
+        input.replace(/-/g," ");
+
+
+    const parts =
+        input
+        .split(/\s+/)
+        .filter(x => x !== "");
+
+
+    parts.forEach(part => {
+
+        /*
+            AB
+            BC
+            CD
+        */
+
+        if(part.length === 2){
+
+            addEdge(
+                part[0],
+                part[1]
+            );
+
+            return;
+
+        }
+
+
+        /*
+            Nếu chuỗi dài hơn 2,
+            thử chia thành từng cặp:
+
+            ABCD
+            => AB + CD
+        */
+
+        if(part.length > 2){
+
+            for(
+                let i = 0;
+                i < part.length - 1;
+                i += 2
+            ){
+
+                const a = part[i];
+
+                const b = part[i + 1];
+
+
+                if(
+                    graphData[a] !== undefined &&
+                    graphData[b] !== undefined
+                ){
+
+                    addEdge(a,b);
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* =====================================================
+   THÊM CẠNH
+===================================================== */
+
+function addEdge(a,b){
+
+    if(
+        !graphData[a] ||
+        !graphData[b]
+    ){
+
+        return;
+
+    }
+
+
+    if(a === b){
+
+        return;
+
+    }
+
+
+    if(!graphData[a].includes(b)){
+
+        graphData[a].push(b);
+
+    }
+
+
+    if(!graphData[b].includes(a)){
+
+        graphData[b].push(a);
+
+    }
+
+
+    const edge1 =
+        a + "-" + b;
+
+    const edge2 =
+        b + "-" + a;
+
+
+    if(
+        !edges.includes(edge1) &&
+        !edges.includes(edge2)
+    ){
+
+        edges.push(edge1);
+
+    }
+
+}
+
+
+/* =====================================================
+   VẼ ĐỒ THỊ
+===================================================== */
+
+function drawGraph(){
+
+    const graph =
+        document.getElementById("graph");
+
+
+    graph.innerHTML = "";
+
+
+    const width =
+        graph.clientWidth;
+
+    const height =
+        graph.clientHeight;
+
+
+    const centerX =
+        width / 2;
+
+    const centerY =
+        height / 2;
+
+
+    const radius =
+        Math.min(width,height) * .35;
+
+
+    const positions = {};
+
+
+    vertices.forEach((vertex,index)=>{
+
+        const angle =
+            (
+                2 *
+                Math.PI *
+                index
+            ) /
+            vertices.length;
+
+
+        positions[vertex] = {
+
+            x:
+                centerX +
+                radius *
+                Math.cos(angle),
+
+            y:
+                centerY +
+                radius *
+                Math.sin(angle)
+
+        };
+
+    });
+
+
+    /* CẠNH */
+
+    edges.forEach(edge=>{
+
+        const parts =
+            edge.split("-");
+
+        const a = parts[0];
+
+        const b = parts[1];
+
+
+        if(
+            !positions[a] ||
+            !positions[b]
+        ){
+
+            return;
+
+        }
+
+
+        const x1 =
+            positions[a].x;
+
+        const y1 =
+            positions[a].y;
+
+        const x2 =
+            positions[b].x;
+
+        const y2 =
+            positions[b].y;
+
+
+        const dx =
+            x2-x1;
+
+        const dy =
+            y2-y1;
+
+
+        const length =
+            Math.sqrt(
+                dx*dx +
+                dy*dy
+            );
+
+
+        const angle =
+            Math.atan2(dy,dx)
+            *180/Math.PI;
+
+
+        const line =
+            document.createElement("div");
+
+
+        line.className = "edge";
+
+
+        line.style.width =
+            length + "px";
+
+
+        line.style.left =
+            x1 + "px";
+
+
+        line.style.top =
+            y1 + "px";
+
+
+        line.style.transform =
+            `rotate(${angle}deg)`;
+
+
+        graph.appendChild(line);
+
+    });
+
+
+    /* ĐỈNH */
+
+    vertices.forEach(vertex=>{
+
+        const node =
+            document.createElement("div");
+
+
+        node.className = "node";
+
+
+        node.id =
+            "node-" + vertex;
+
+
+        node.textContent =
+            vertex;
+
+
+        node.style.left =
+            (
+                positions[vertex].x - 31
+            ) + "px";
+
+
+        node.style.top =
+            (
+                positions[vertex].y - 31
+            ) + "px";
+
+
+        graph.appendChild(node);
+
+    });
+
+}
+
+
+/* =====================================================
+   KẾT QUẢ BAN ĐẦU
+===================================================== */
+
+function showInitialResult(){
+
+    document.getElementById("order").innerHTML =
+
+        `<span style="color:#64748b;">
+            Nhấn "Từng bước" để bắt đầu
+        </span>`;
+
+
+    document.getElementById("status")
+        .textContent =
+        "Sẵn sàng thực hiện DFS";
+
+
+    document.getElementById("explanation")
+        .textContent =
+        "Đồ thị đã được tạo. Hãy nhấn 'Từng bước' để xem thuật toán DFS hoạt động.";
+
+
+    document.getElementById("stepTable")
+        .innerHTML = "";
+
+
+    updateProgress(0);
+
+}
+
+
+/* =====================================================
+   TIẾN TRÌNH
+===================================================== */
+
+function updateProgress(value){
+
+    const percent =
+        Math.round(value);
+
+
+    document.getElementById("progressBar")
+        .style.width =
+        percent + "%";
+
+
+    document.getElementById("progressText")
+        .textContent =
+        percent + "%";
+
+}
+
+
+/* =====================================================
+   TỪNG BƯỚC
+===================================================== */
+
+function nextStep(){
+
+    if(currentStep >= dfsOrder.length){
+
+        document.getElementById("status")
+            .textContent =
+            "✅ Đã hoàn thành DFS";
+
+
+        document.getElementById("explanation")
+            .textContent =
+            "Thuật toán đã duyệt xong tất cả các đỉnh có thể tiếp cận từ đỉnh bắt đầu.";
+
+
+        document.getElementById("stepBtn")
+            .disabled = true;
+
+
+        updateProgress(100);
+
+        return;
+
+    }
+
+
+    const currentVertex =
+        dfsOrder[currentStep];
+
+
+    const node =
+        document.getElementById(
+            "node-" + currentVertex
+        );
+
+
+    if(node){
+
+        document
+            .querySelectorAll(".node")
+            .forEach(n=>{
+
+                n.classList.remove("current");
+
+            });
+
+
+        node.classList.add("visited");
+
+        node.classList.add("current");
+
+    }
+
+
+    /* THỨ TỰ */
+
+    const order =
+        document.getElementById("order");
+
+
+    order.innerHTML = "";
+
+
+    for(
+        let i=0;
+        i<=currentStep;
+        i++
+    ){
+
+        const item =
+            document.createElement("div");
+
+
+        item.className =
+            "order-node";
+
+
+        item.textContent =
+            dfsOrder[i];
+
+
+        order.appendChild(item);
+
+
+        if(i<currentStep){
+
+            const arrow =
+                document.createElement("span");
+
+
+            arrow.className =
+                "arrow";
+
+
+            arrow.textContent =
+                "→";
+
+
+            order.appendChild(arrow);
+
+        }
+
+    }
+
+
+    /* GIẢI THÍCH */
+
+    let explanationText;
+
+
+    if(currentStep === 0){
+
+        explanationText =
+            "DFS bắt đầu tại đỉnh " +
+            currentVertex +
+            ". Đỉnh này được đánh dấu là đã thăm.";
+
+    }
+    else{
+
+        explanationText =
+            "DFS đi sâu đến đỉnh " +
+            currentVertex +
+            ", sau khi các đỉnh trước đó đã được xét.";
+
+    }
+
+
+    document.getElementById("status")
+        .textContent =
+        "Đang duyệt đỉnh " +
+        currentVertex;
+
+
+    document.getElementById("explanation")
+        .textContent =
+        explanationText;
+
+
+    /* BẢNG */
+
+    const table =
+        document.getElementById("stepTable");
+
+
+    const row =
+        document.createElement("tr");
+
+
+    row.innerHTML = `
+
+        <td>
+            ${currentStep + 1}
+        </td>
+
+        <td>
+            <b>${currentVertex}</b>
+        </td>
+
+        <td>
+            ${
+                dfsOrder
+                .slice(0,currentStep+1)
+                .join(" → ")
+            }
+        </td>
+
+        <td>
+            ${explanationText}
+        </td>
+
+    `;
+
+
+    table.appendChild(row);
+
+
+    currentStep++;
+
+
+    const progress =
+        (
+            currentStep /
+            dfsOrder.length
+        ) * 100;
+
+
+    updateProgress(progress);
+
+
+    if(currentStep >= dfsOrder.length){
+
+        setTimeout(()=>{
+
+            document.getElementById("status")
+                .textContent =
+                "✅ Đã hoàn thành DFS";
+
+
+            document.getElementById("explanation")
+                .textContent =
+                "Thuật toán đã duyệt xong tất cả các đỉnh có thể tiếp cận từ đỉnh bắt đầu.";
+
+
+            document.getElementById("stepBtn")
+                .disabled = true;
+
+
+        },300);
+
+    }
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+function resetAll(){
+
+    graphData = {};
+
+    vertices = [];
+
+    edges = [];
+
+    dfsOrder = [];
+
+    currentStep = 0;
+
+
+    document.getElementById("graph")
+        .innerHTML = `
+
+        <div class="graph-message">
+
+            🧩
+
+            <br><br>
+
+            Nhập dữ liệu rồi nhấn
+            <b>"Tạo đồ thị & chạy DFS"</b>
+
+        </div>
+
+    `;
+
+
+    document.getElementById("order")
+        .innerHTML =
+        "Chưa thực hiện DFS";
+
+
+    document.getElementById("status")
+        .textContent =
+        "Chưa bắt đầu";
+
+
+    document.getElementById("explanation")
+        .textContent =
+        "Nhập đồ thị rồi nhấn 'Tạo đồ thị & chạy DFS'.";
+
+
+    document.getElementById("stepTable")
+        .innerHTML = `
+
+        <tr>
+
+            <td colspan="4">
+                Chưa có dữ liệu
+            </td>
+
+        </tr>
+
+    `;
+
+
+    document.getElementById("stepBtn")
+        .disabled = true;
+
+
+    updateProgress(0);
+
+}
+
+</script>
+
+</body>
+
+
