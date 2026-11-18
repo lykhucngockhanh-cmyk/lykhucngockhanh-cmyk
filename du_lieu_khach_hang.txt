@@ -1,0 +1,5 @@
+K001,Nguyen Van An,100,150,50
+K002,Tran Thi Binh,200,280,80
+K003,Le Van Cuong,300,400,100
+K004,Pham Thi Dung,500,650,150
+K005,Hoang Van Nam,1000,1200,200
